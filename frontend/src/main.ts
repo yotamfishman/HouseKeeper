@@ -16,11 +16,4 @@ app.component('vue-sidebar-menu-akahon', VueSidebarMenuAkahon);
 app.use(router);
 app.use(BootstrapVueNext)
 
-
-//app.component('vue-navigation-bar', VueNavigationBar);
-// app.use(BootstrapVue)
-// app.use(BootstrapVueIcons)
-// app.component("BootstrapVue", BootstrapVue)
-// app.component("BootstrapVue", BootstrapVueIcons)
-
 app.mount("#app");

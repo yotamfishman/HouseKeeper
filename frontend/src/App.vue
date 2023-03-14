@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import SideBar from "./components/SideBar.vue"
+name:"App.vue"
 components: {
   SideBar
   }
@@ -13,4 +14,6 @@ components: {
   </div>
 </template>
 
-<style></style>
+<style>
+
+</style>

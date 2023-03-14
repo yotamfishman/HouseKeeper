@@ -3,7 +3,7 @@
                            :isSearch="false"
                            :menuTitle="'House Keeper'"
                            :menuLogo="'/favicon.ico'"
-                           :profileImg="'/src/assets/img/profile.jpg'"
+                           :profileImg="'/img/profile.jpg'"
                            :menuItems="[
                             {
                               link: '/',
