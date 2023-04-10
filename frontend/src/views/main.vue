@@ -6,7 +6,7 @@
                 :title="chore.title"
                 :description="chore.description"
                 :icon="chore.icon"
-                :duretion="chore.duretion"
+                :duration="chore.duration"
              />
         </b-row>
     </b-container>
@@ -14,35 +14,31 @@
 
 <script lang="ts">
 import ChoreCard from "../components/ChoreCard.vue";
+import axios from "axios"
+
+interface CardData {
+  title: string, 
+  description: string, 
+  icon: string, 
+  duration: string,
+  _id: number,
+}
+
+interface Data {
+  chores: CardData[]
+}
   
   export default {
     name: "main.vue",
     components: { ChoreCard },
-    data() {
+    data() : Data {
       return {
-        chores: [
-            {
-            title: "Take out the trash",
-            description: "Take the trash out from the can",
-            icon: "/icons/trash.svg",
-            duretion: "4 minutes",
-            },
-            {
-                title: "Wash the dishes",
-                description: "wash all the dishes in th sinks",
-                icon: "/icons/sink.svg",
-                duretion: "30 minutes",
-            },
-            {
-                title: "Water the plants",
-                description: "Make sure to water to water the plants in the living roo as well",
-                icon: "/icons/leaf.svg",
-                duretion: "10 minutes"
-            },
-            
-    ]
+        chores: []
       };
     },
+    mounted () {
+      axios.get("http://127.0.0.1:5000/my-chores.json").then(response => (this.chores = response.data))
+    }
   };
 </script>
 

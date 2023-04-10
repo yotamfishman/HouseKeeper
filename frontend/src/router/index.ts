@@ -13,7 +13,7 @@ const router = createRouter({
     {
       path: "/add",
       name: "Add Chores",
-      component: () => add,
+      component: add,
     },
   ],
 });

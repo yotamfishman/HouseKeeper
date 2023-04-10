@@ -12,7 +12,7 @@
         ></b-card-img>
         <b-card-title>{{title}}</b-card-title>
         <b-card-text>{{description}}</b-card-text>
-        <b-card-text>{{duretion}}</b-card-text>
+        <b-card-text>{{duration}}</b-card-text>
     </b-card-body>
   </b-card>
 </template>
@@ -32,7 +32,7 @@
             type: String,
             required: true,
         },
-        duretion: {
+        duration: {
             type: String,
             required: true,
         }

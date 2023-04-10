@@ -4,6 +4,7 @@
                            :menuTitle="'House Keeper'"
                            :menuLogo="'/favicon.ico'"
                            :profileImg="'/img/profile.jpg'"
+                           @button-exit-clicked="logout"
                            :menuItems="[
                             {
                               link: '/',
@@ -35,7 +36,8 @@
   
   
   <script lang="ts">
-  import VueSidebarMenuAkahon from "vue-sidebar-menu-akahon";
+  import axios from "axios";
+import VueSidebarMenuAkahon from "vue-sidebar-menu-akahon";
   
   export default {
     name: "SideBar.vue",
@@ -43,6 +45,13 @@
     data() {
       return {};
     },
+    methods: {
+      logout() {
+        axios.post('/logout').then(response => {
+                    window.location.href = '/login'; // Redirect the client to the new URL
+                })
+      }
+    }
   };
   </script>
 
