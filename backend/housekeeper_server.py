@@ -1,56 +1,28 @@
 from flask import Flask, jsonify, send_from_directory, request, redirect, url_for, abort, make_response
-from flask_pymongo import PyMongo
-from flask_login import LoginManager, mixins, login_user, login_required, logout_user
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from .chores import Chore
+from .data_base_manager import DbManager
 
 app= Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
-app.config["MONGO_URI"] = "mongodb://localhost:27017/myDatabase"
-mongo = PyMongo(app)
 
 app.secret_key = b'\xd2\xf2\n\xbd\x0c*#\xbf\xad\x12\x86\x89\xee\x866~'
+DbManager.init(app)
 
-mongo.db.users.delete_many({})
-mongo.db.users.insert_one({
-    "_id": "0",
-    "name": "yotam",
-    "passwd": "1234"
-})
-
-class User (mixins.UserMixin):
-    def __init__(self, name: str, user_id, passwd: str):
-        self.name = name
-        self.id = user_id
-        self.passwd = passwd
+DbManager.users.clear_all()
+DbManager.users.add_user("Yotam", "1234")
 
 
 @login_manager.user_loader
 def load_user(usr_id):
-    user = mongo.db.users.find_one({"_id": usr_id})
-    if user is None:
-        return None
-    return User(user["name"], user["_id"], user["passwd"])
+    return DbManager.users.get_user_by_id(usr_id)
 
 
-mongo.db.chores.delete_many({})
-mongo.db.chores.insert_one( {
-            "title": "Take out the trash",
-            "description": "Take the trash out from the can",
-            "icon": "/icons/trash.svg",
-            "duration": "4 minutes",
-            })
-mongo.db.chores.insert_one( {
-            "title": "Wash the dishes",
-            "description": "wash all the dishes in the sinks",
-            "icon": "/icons/sink.svg",
-            "duration": "30 minutes",
-            })
-mongo.db.chores.insert_one( {
-            "title": "Water the plants",
-            "description": "Make sure to water to water the plants in the living roo as well",
-            "icon": "/icons/leaf.svg",
-            "duration": "10 minutes",
-            })
+DbManager.chores.clear_all()
+DbManager.chores.add_chore(Chore("Take out the trash", "Take the trash out from the can", "/icons/trash.svg", "4 minutes", current_user.id))
+DbManager.chores.add_chore(Chore("Wash the dishes", "wash all the dishes in the sinks", "/icons/sink.svg", "30 minutes", current_user.id))
+DbManager.chores.add_chore(Chore("Water the plants", "Make sure to water to water the plants in the living roo as well", "/icons/leaf.svg", "10 minutes", current_user.id))
 
 
 @login_manager.unauthorized_handler
@@ -71,28 +43,26 @@ def login():
 def login_post():
     name = request.json["name"]
     passwd = request.json["passwd"]
-    user_data = mongo.db.users.find_one({"name": name})
-    if passwd != user_data["passwd"]:
+    user = DbManager.users.get_user_by_name(name)
+    if user is None or passwd != user.passwd:
         abort(401)
     
     logout_user()
-    login_user(User(name, user_data["_id"], passwd))
+    login_user(user)
     return make_response('OK')
 
 @app.route('/add', methods = ['POST'])
 @login_required
 def add():
     chore = request.json
-    mongo.db.chores.insert_one(chore)
+    DbManager.chores.add_chore(Chore.create(chore))
     return make_response('OK')
 
 
 @app.route('/my-chores.json')
 @login_required
 def my_choures_json():
-    chorse = [chore for chore in mongo.db.chores.find()]
-    for chore in chorse:
-        chore.pop("_id")
+    chorse = [chore.json for chore in DbManager.chores.get_all_chores()]
     return jsonify(chorse)
 
 @app.route('/logout', methods=['GET', 'POST'])
@@ -101,9 +71,15 @@ def logout():
     logout_user()
     return make_response('OK')
 
+@app.route('/username.json')
+@login_required
+def user_json():
+    user = load_user(current_user.id)
+    return jsonify({"username": user.name})
+
 @app.route('/<path:path>')
 def serve_static(path: str):
     return send_from_directory('../frontend/dist', path)
 
-
-app.run()
+if __name__ == "__main__":
+    app.run()

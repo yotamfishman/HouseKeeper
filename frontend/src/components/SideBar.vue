@@ -4,6 +4,7 @@
                            :menuTitle="'House Keeper'"
                            :menuLogo="'/favicon.ico'"
                            :profileImg="'/img/profile.jpg'"
+                           :profileName="username"
                            @button-exit-clicked="logout"
                            :menuItems="[
                             {
@@ -43,7 +44,9 @@ import VueSidebarMenuAkahon from "vue-sidebar-menu-akahon";
     name: "SideBar.vue",
     components: { VueSidebarMenuAkahon },
     data() {
-      return {};
+      return {
+        username: ""
+      };
     },
     methods: {
       logout() {
@@ -51,6 +54,9 @@ import VueSidebarMenuAkahon from "vue-sidebar-menu-akahon";
                     window.location.href = '/login'; // Redirect the client to the new URL
                 })
       }
+    },
+    mounted() {
+      axios.get('/username.json').then(response => (this.username) = response.data.username)
     }
   };
   </script>
